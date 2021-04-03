@@ -57,6 +57,7 @@ static void MX_TIM3_Init(void);
 /* USER CODE BEGIN 0 */
 void Set_Motor_Direction(GPIO_TypeDef* GPIOx_Left, GPIO_TypeDef* GPIOx_Right,  uint16_t GPIO_Pin_Left, uint16_t GPIO_Pin_Right, int motor_Value);
 void Set_Motor_Value(TIM_HandleTypeDef* htimx, uint32_t TIM_CHANNEL_X, int motor_Value);
+int abs(int x);
 /* USER CODE END 0 */
 
 /**
@@ -97,30 +98,27 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int max_val = -50;
+	int wheel_val = 0;
+	int inc = 1;
   while (1)
   {
-	max_val = -max_val;
-	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	Set_Motor_Direction(MC_A0_GPIO_Port, MC_A1_GPIO_Port, MC_A0_Pin, MC_A1_Pin, max_val);
-	Set_Motor_Direction(MC_A2_GPIO_Port, MC_A3_GPIO_Port, MC_A2_Pin, MC_A3_Pin, max_val);
+  	// "sinusoidal" output voltage
+  	while (abs(wheel_val) < 100)
+		{
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // dbg ping toggle
 
-	Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, 0);
-	HAL_Delay(1000);
-	Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, 25);
-	HAL_Delay(1000);
+			// https://www.engineersgarage.com/wp-content/uploads/2/2/1/5/22159166/dc-motor-speed-and-direction-control-with-stm32-microcontroller-and-l293d-motor-driver_orig.png
+			Set_Motor_Direction(MC_A0_GPIO_Port, MC_A1_GPIO_Port, MC_A0_Pin, MC_A1_Pin, wheel_val);
+			Set_Motor_Direction(MC_A2_GPIO_Port, MC_A3_GPIO_Port, MC_A2_Pin, MC_A3_Pin, wheel_val);
 
-	Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, 50);
-	HAL_Delay(1000);
+			Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, wheel_val);
+			Set_Motor_Value(&MC_HTIM, MC_PWM2_TIM_CHANNEL, wheel_val);
 
-	Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, 75);
-	HAL_Delay(1000);
-
-	Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, 100);
-	HAL_Delay(1000);
-	//__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 50);
-		//Set_Motor_Value(&htim3, MC_PWM2_TIM_CHANNEL, pwm_val);
-		//Set_Motor_Direction(MC_A2_GPIO_Port, MC_A3_GPIO_Port, MC_A2_Pin, MC_A3_Pin, );
+			HAL_Delay(20);
+			wheel_val = wheel_val + inc;
+		}
+  	inc = -inc;
+  	wheel_val = wheel_val + inc;
 
     /* USER CODE END WHILE */
 
