@@ -102,20 +102,20 @@ int main(void)
 	int inc = 1;
   while (1)
   {
-  	// "sinusoidal" output voltage
-  	while (abs(wheel_val) < 100)
-		{
-			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // dbg ping toggle
+    // "sinusoidal" output voltage
+    while (abs(wheel_val) < 100)
+    {
+      HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // dbg ping toggle
 
 			// https://www.engineersgarage.com/wp-content/uploads/2/2/1/5/22159166/dc-motor-speed-and-direction-control-with-stm32-microcontroller-and-l293d-motor-driver_orig.png
-			Set_Motor_Direction(MC_A0_GPIO_Port, MC_A1_GPIO_Port, MC_A0_Pin, MC_A1_Pin, wheel_val);
+      Set_Motor_Direction(MC_A0_GPIO_Port, MC_A1_GPIO_Port, MC_A0_Pin, MC_A1_Pin, wheel_val);
 			Set_Motor_Direction(MC_A2_GPIO_Port, MC_A3_GPIO_Port, MC_A2_Pin, MC_A3_Pin, wheel_val);
 
 			Set_Motor_Value(&MC_HTIM, MC_PWM1_TIM_CHANNEL, wheel_val);
 			Set_Motor_Value(&MC_HTIM, MC_PWM2_TIM_CHANNEL, wheel_val);
 
 			HAL_Delay(20);
-			wheel_val = wheel_val + inc;
+      wheel_val = wheel_val + inc;
 		}
   	inc = -inc;
   	wheel_val = wheel_val + inc;
